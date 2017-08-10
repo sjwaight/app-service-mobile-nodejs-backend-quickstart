@@ -99,7 +99,9 @@ For more information, see [How to: Send push notifications](https://azure.micros
 
 ### Client-added push notification tags
 
-When a mobile app registers for push notifications using an Azure App Service Mobile Apps backend, there are two default tags that can get added to the registration in Azure Notification Hubs: the installation ID, which is unique to the app on a given device, and the user ID, which is only added when the user has been previously authenticated. Any other tags that get supplied by the client are ignored, which is by design. (Note that this differs from Mobile Services, where the client could supply any tag and there were hooks into the registration process on the backend to validate tags on incoming registrations.) 
+When a mobile app registers for push notifications using an Azure App Service Mobile Apps backend, there are two default tags that can get added to the registration in Azure Notification Hubs: the installation ID, which is unique to the app on a given device, and the user ID, which is only added when the user has been previously authenticated. Any other tags that get supplied by the client are ignored, which is by design.
+
+Note that this differs from Mobile Services, where the client could supply any tag and there were hooks into the registration process on the backend to validate tags on incoming registrations.
 
 Because the client can’t add tags and at the same time there are no service-side hooks into the push notification registration process, the client needs to do the work of adding new tags to a given registration. In this sample, there is an **UpdateTags.js** custom API file that defines an `/updatetags` endpoint to enable clients to add tags to their push registration. The client calls that endpoint with its *installationId* to create new tags. 
 
