@@ -62,9 +62,11 @@ After successful deployment, you are ready to test. Because authentication is en
 ## Implementation notes 
 This section highlights changes made to the original tutorial samples and other design decisions were made when implementing all of the features or Mobile Apps in the same client app. 
 
-###Push to users
+### Push to users
+
 The push notification tutorial sends broadcast push notifications to all registrations. Because authentication is enabled in the backed, all push notification registration requests handled by the backend from Mobile Apps clients get a userId tag added to the registration automatically. This tag can then be used to send push notifications to a specific user. The code below gets the userID for the logged in user and uses it to send a notification to only that user.
 
+```node
 	// Define the template payload and userId tag.
 	var payload = '{"messageParam":' + context.item.text + '}'; 
 	
@@ -85,21 +87,25 @@ The push notification tutorial sends broadcast push notifications to all registr
 	        // Don't forget to return the results from the context.execute()
 	        return results;
 	    });
+```
 
 If the user has registered on multiple devices, each device will get a notification.
 
-###Template push notification registration
+### Template push notification registration
+
 The original push notification tutorial used native registrations. This sample has been changed to use a template registration, which makes it easier to send push notifications to users on multiple clients from a single **send** method call. You can see in the above code that the **send()** method is called, which sends a notification to all platforms.
 
 For more information, see [How to: Send push notifications](https://azure.microsoft.com/documentation/articles/app-service-mobile-node-backend-how-to-use-server-sdk/#push-user).
 
-###Client-added push notification tags
+### Client-added push notification tags
+
 When a mobile app registers for push notifications using an Azure App Service Mobile Apps backend, there are two default tags that can get added to the registration in Azure Notification Hubs: the installation ID, which is unique to the app on a given device, and the user ID, which is only added when the user has been previously authenticated. Any other tags that get supplied by the client are ignored, which is by design. (Note that this differs from Mobile Services, where the client could supply any tag and there were hooks into the registration process on the backend to validate tags on incoming registrations.) 
 
 Because the client can’t add tags and at the same time there are no service-side hooks into the push notification registration process, the client needs to do the work of adding new tags to a given registration. In this sample, there is an **UpdateTags.js** custom API file that defines an `/updatetags` endpoint to enable clients to add tags to their push registration. The client calls that endpoint with its *installationId* to create new tags. 
 
 The following code updates an installation to add user-supplied tags:
 
+```node
 	// Get the notification hub used by the mobile app.
 	var push = request.azureMobile.push;
 	var installationId = request.params.id;
@@ -133,5 +139,6 @@ The following code updates an installation to add user-supplied tags:
 			response.status(200).send(tags);
 		}
 	});
+```
 
 Note that due to the limitations of the default custom API implementation in Mobile Apps, we needed to use an express.js Router to handle passing the installation ID in the URL. This also required us to pass the authentication and authorization middleware to the router. For more information, see [Adding push notification tags from the client](https://blogs.msdn.microsoft.com/writingdata_services/2016/04/14/adding-push-notification-tags-from-a-node-js-backend/).
